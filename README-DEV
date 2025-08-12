@@ -1,0 +1,42 @@
+# Package decisions
+
+- Upstream doesn't seem to use semver (see e.g. git diff 4.4 4.4.1 --
+  OpenSim/Common/C3DFileAdapter.h which breaks bin compat). So probably need
+  to use upstream-version in manifest.
+
+# Upstream build
+
+if(OPENSIM_DISABLE_STATIC_TYPE_REGISTRATION)
+    add_definitions(-DOPENSIM_DISABLE_STATIC_TYPE_REGISTRATION=1)
+endif()
+
+PLATFORM_NAME (Windows, Mac, Linux...)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(PLATFORM_ABI x64)
+else()
+    set(PLATFORM_ABI x86)
+endif()
+
+default_build_inst_set
+BUILD_INST_SET
+inst_set_to_use
+
+-funroll-loops
+-Wshorten-64-to-32 (Clang)
+add_compile_options($<$<NOT:$<CONFIG:Debug>>:-Wno-unused-variable>
+                    $<$<NOT:$<CONFIG:Debug>>:-Wno-unused-parameter>)
+
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
+    NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS "5.0.0"))
+    add_compile_options(-Wno-unused-local-typedefs)
+endif()
+
+Lots of MSVC-specific compilation options in root CMakeLists.txt
+
+if(WIN32)
+    add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+endif()
+
+C++17 is required
+
