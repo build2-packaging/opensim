@@ -1,0 +1,15 @@
+: 1
+name: libopensim
+version: 0.1.0-a.0.z
+language: c++
+summary: opensim C++ library
+license: Apache-2.0 ; Apache License 2.0.
+description-file: README.md
+package-description-file: PACKAGE-README.md
+changes-file: CHANGELOG.md
+url: https://example.org/upstream
+email: upstream@example.org
+package-url: https://github.com/build2-packaging/libopensim
+package-email: packaging@build2.org ; Mailing list.
+depends: * build2 >= 0.17.0
+depends: * bpkg >= 0.17.0

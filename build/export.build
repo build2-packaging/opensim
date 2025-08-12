@@ -1,0 +1,6 @@
+$out_root/
+{
+  include libopensim/
+}
+
+export $out_root/libopensim/$import.target
