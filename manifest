@@ -13,5 +13,5 @@ package-url: https://github.com/build2-packaging/libopensim
 package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
-depends: spdlog
-depends: libsimbody
+depends: spdlog ^1.14.1
+depends: libsimbody ^3.8.0-
