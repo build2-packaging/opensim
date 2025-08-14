@@ -1,9 +1,43 @@
-intf_libs = # Interface dependencies.
+import spdlog  = spdlog%lib{spdlog}
+import simbody = libsimbody%lib{SimTKsimbody}
+
+# Determines the OS name and system info to be used for the OSIM_OS_NAME and
+# OSIM_SYS_INFO macros. Note that these are only used in Common/About.cpp so
+# are only for informational purposes and thus not super important.
+
+# Determine the OS name. Upstream uses CMAKE_SYSTEM_INFO so use values from
+# https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_NAME.html.
+#
+switch $cxx.target.class, $cxx.target.system
+{
+  case 'linux'
+    osname = 'Linux'
+  case 'windows'
+    osname = 'Windows' # Note: Includes Mingw-w64
+  case 'bsd', 'freebsd'
+    osname = 'FreeBSD'
+  case 'bsd', 'openbsd'
+    osname = 'OpenBSD'
+  case 'bsd', 'netbsd'
+    osname = 'NetBSD'
+  case 'macos'
+    osname = 'Darwin'
+  case 'ios'
+    osname = 'iOS'
+}
+
+# Upstream adds the OS version but it's not always available so skip it.
+#
+sysinfo = "$osname-$cxx.target.cpu"
+
 impl_libs = # Implementation dependencies.
 #import xxxx_libs += libhello%lib{hello}
 
 ./: lib{osimLepton}: Vendors/lepton/include/hxx{**} \
                      Vendors/lepton/src/{hxx cxx}{*}
+
+./: lib{osimCommon}: OpenSim/Common/{hxx cxx}{* -C3DFileAdapter } \
+                     OpenSim/Common/{h c}{gcvspl}
 
 # Build options.
 #
@@ -15,13 +49,62 @@ impl_libs = # Implementation dependencies.
 Vendors/lepton/src/obj{*}: \
   cxx.poptions += "-I$src_root/libopensim/Vendors/lepton/include"
 
+OpenSim/Common/obj{*}:
+{
+  cxx.poptions += "-I$src_root/libopensim"                                              \
+                  -DOPENSIM_COMMON_AUTHORS=\"Clay_Anderson-Ayman_Habib-Peter_Loan\"     \
+                  -DOPENSIM_COMMON_COPYRIGHT_YEARS=\"2005-2017\"                        \
+                  -DOPENSIM_COMMON_LIBRARY_NAME=osimCommon                              \
+                  -DOPENSIM_COMMON_MAJOR_VERSION="$version.major"                       \
+                  -DOPENSIM_COMMON_MINOR_VERSION="$version.minor"                       \
+                  -DOPENSIM_COMMON_BUILD_VERSION="$version.patch"                       \
+                  -DOSIMCOMMON_EXPORTS                                                  \
+                  -DOSIM_COMPILER_INFO="$effect($cxx.path)"                             \
+                  -DOSIM_OS_NAME="$osname"                                              \
+                  -DOSIM_SYS_INFO="$sysinfo"                                            \
+                  -DOSIM_VERSION="$version"
+
+  # @@ TODO Pretty sure this should be exported from lib{spdlog}. See
+  #    https://github.com/build2-packaging/spdlog/issues/22.
+  #
+  cxx.poptions += -DSPDLOG_COMPILED_LIB
+
+  # Work around Simbody bug https://github.com/simbody/simbody/issues/836.
+  #
+  # Note that without -DSWIG_PYTHON the problematic relops described in that
+  # issue are enabled in my case (g++ 14.2) because
+  # __cpp_lib_three_way_comparison is undefined in case of -std=c++17 because
+  # <=> was only introduced in C++20. But OpenSIM only supports C++17. With
+  # later standards I get compilation errors in spdlog. They could probably be
+  # fixed but OpenSIM very explicitly insists on C++17 in their
+  # CMakeLists.txt.
+  #
+  # This is obviously a dirty hack (we don't even build the bindings) which
+  # only "works by accident" but until the upstream issue(s) are addressed
+  # it's the least intrusive solution. @@ TODO Reconsider?
+  #
+  cxx.poptions += -DSWIG_PYTHON
+}
+
+# Note that upstream does not build static libraries. I don't think it's
+# supported.
+#
+OpenSim/Common/objs{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Shared\"
+OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\"
+
 #obja{*}: cxx.poptions += -DLIBOPENSIM_STATIC_BUILD
 #objs{*}: cxx.poptions += -DLIBOPENSIM_SHARED_BUILD
+
+# Libraries
+#
+lib{osimCommon}: $simbody $spdlog lib{osimLepton}
 
 # Export options.
 #
 lib{osimLepton}: \
   cxx.export.poptions = "-I$src_root/libopensim/Vendors/lepton/include"
+
+lib{osimCommon}: cxx.export.libs = $simbody $spdlog lib{osimLepton}
 
 #liba{opensim}: cxx.export.poptions += -DLIBOPENSIM_STATIC
 #libs{opensim}: cxx.export.poptions += -DLIBOPENSIM_SHARED
