@@ -30,18 +30,17 @@ switch $cxx.target.class, $cxx.target.system
 #
 sysinfo = "$osname-$cxx.target.cpu"
 
-impl_libs = # Implementation dependencies.
-#import xxxx_libs += libhello%lib{hello}
-
+# Headers and source files.
+#
 ./: lib{osimLepton}: Vendors/lepton/include/hxx{**} \
                      Vendors/lepton/src/{hxx cxx}{*}
 
 ./: lib{osimCommon}: OpenSim/Common/{hxx cxx}{* -C3DFileAdapter } \
                      OpenSim/Common/{h c}{gcvspl}
 
+./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/**}
+
 # Build options.
-#
-# cxx.poptions =+ "-I$out_root" "-I$src_root"
 
 # Note that none of the macros defined in the upstream build are referenced in
 # Vendors/lepton.
@@ -86,18 +85,36 @@ OpenSim/Common/obj{*}:
   cxx.poptions += -DSWIG_PYTHON
 }
 
+OpenSim/Simulation/obj{*}:                                                      \
+  cxx.poptions +=                                                               \
+    "-I$src_root/libopensim"                                                    \
+    -DOPENSIM_SIMULATION_AUTHORS=\"Ajay_Seth-Michael_Sherman-Ayman_Habib\"      \
+    -DOPENSIM_SIMULATION_COPYRIGHT_YEARS=\"2005-2017\"                          \
+    -DOPENSIM_SIMULATION_LIBRARY_NAME=osimSimulation                            \
+    -DOPENSIM_SIMULATION_MAJOR_VERSION="$version.major"                         \
+    -DOPENSIM_SIMULATION_MINOR_VERSION="$version.minor"                         \
+    -DOPENSIM_SIMULATION_BUILD_VERSION="$version.patch"                         \
+    -DOSIMSIMULATION_EXPORTS                                                    \
+    -DOSIM_COMPILER_INFO="$effect($cxx.path)"                                   \
+    -DOSIM_OS_NAME="$osname"                                                    \
+    -DOSIM_SYS_INFO="$sysinfo"                                                  \
+    -DOSIM_VERSION="$version"                                                   \
+    -DSPDLOG_COMPILED_LIB                                                       \
+    -DSWIG_PYTHON
+
 # Note that upstream does not build static libraries. I don't think it's
 # supported.
 #
 OpenSim/Common/objs{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Shared\"
 OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\"
 
-#obja{*}: cxx.poptions += -DLIBOPENSIM_STATIC_BUILD
-#objs{*}: cxx.poptions += -DLIBOPENSIM_SHARED_BUILD
+OpenSim/Simulation/objs{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Shared\"
+OpenSim/Simulation/obja{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Static\"
 
 # Libraries
 #
 lib{osimCommon}: $simbody $spdlog lib{osimLepton}
+lib{osimSimulation}: lib{osimCommon}
 
 # Export options.
 #
@@ -106,17 +123,21 @@ lib{osimLepton}: \
 
 lib{osimCommon}: cxx.export.libs = $simbody $spdlog lib{osimLepton}
 
-#liba{opensim}: cxx.export.poptions += -DLIBOPENSIM_STATIC
-#libs{opensim}: cxx.export.poptions += -DLIBOPENSIM_SHARED
+# TODO Not clear whether Simulation's deps are public or not.
+# lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
 # the version module for details on the version.* variable values.
 #
 if $version.pre_release
-  lib{osimLepton}: bin.lib.version = "-$version.project_id"
+  lib{osimLepton \
+      osimCommon \
+      osimSimulation}: bin.lib.version = "-$version.project_id"
 else
-  lib{osimLepton}: bin.lib.version = "-$version.major.$version.minor"
+  lib{osimLepton \
+      osimCommon \
+      osimSimulation}: bin.lib.version = "-$version.major.$version.minor"
 
 # Install into the libopensim/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
