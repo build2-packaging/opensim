@@ -1,0 +1,1 @@
+../../../upstream/OpenSim/Common/RegisterTypes_osimCommon.h
