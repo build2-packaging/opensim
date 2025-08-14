@@ -1,0 +1,4 @@
+Control symlink=dir
+Manager symlink=dir
+Model   symlink=dir
+Wrap    symlink=dir
