@@ -77,6 +77,10 @@ void IMUPlacer::constructProperties() {
 //=============================================================================
 // UTILITY
 //=============================================================================
+
+template <> struct fmt::formatter<SimTK::Rotation_<double>> :
+  ostream_formatter {};
+
 //_____________________________________________________________________________
 /**
  * This method runs the calibration method on the _model maintained by
