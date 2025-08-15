@@ -40,6 +40,8 @@ sysinfo = "$osname-$cxx.target.cpu"
 
 ./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/**}
 
+./: lib{osimActuators}: OpenSim/Actuators/{hxx cxx}{** -Test/*}
+
 # Build options.
 
 # Note that none of the macros defined in the upstream build are referenced in
@@ -102,6 +104,23 @@ OpenSim/Simulation/obj{*}:                                                      
     -DSPDLOG_COMPILED_LIB                                                       \
     -DSWIG_PYTHON
 
+OpenSim/Actuators/obj{*}:                                                               \
+  cxx.poptions +=                                                                       \
+    "-I$src_root/libopensim"                                                            \
+    -DOPENSIM_ACTUATORS_AUTHORS=\"Ajay_Seth-Matt_Millard-Matt_Demers-Ayman_Habib\"      \
+    -DOPENSIM_ACTUATORS_COPYRIGHT_YEARS=\"2005-2017\"                                   \
+    -DOPENSIM_ACTUATORS_LIBRARY_NAME=osimActuators                                      \
+    -DOPENSIM_ACTUATORS_MAJOR_VERSION="$version.major"                                  \
+    -DOPENSIM_ACTUATORS_MINOR_VERSION="$version.minor"                                  \
+    -DOPENSIM_ACTUATORS_BUILD_VERSION="$version.patch"                                  \
+    -DOSIMACTUATORS_EXPORTS                                                             \
+    -DOSIM_COMPILER_INFO="$effect($cxx.path)"                                           \
+    -DOSIM_OS_NAME="$osname"                                                            \
+    -DOSIM_SYS_INFO="$sysinfo"                                                          \
+    -DOSIM_VERSION="$version"                                                           \
+    -DSPDLOG_COMPILED_LIB                                                               \
+    -DSWIG_PYTHON
+
 # Note that upstream does not build static libraries. I don't think it's
 # supported.
 #
@@ -111,33 +130,38 @@ OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\"
 OpenSim/Simulation/objs{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Shared\"
 OpenSim/Simulation/obja{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Static\"
 
+OpenSim/Actuators/objs{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Shared\"
+OpenSim/Actuators/obja{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Static\"
+
 # Libraries
 #
 lib{osimCommon}: $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: lib{osimCommon}
+lib{osimActuators}: lib{osimSimulation}
 
 # Export options.
 #
 lib{osimLepton}: \
   cxx.export.poptions = "-I$src_root/libopensim/Vendors/lepton/include"
 
-lib{osimCommon}: cxx.export.libs = $simbody $spdlog lib{osimLepton}
-
-# TODO Not clear whether Simulation's deps are public or not.
-# lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
+lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
+lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
+lib{osimActuators}:  cxx.export.libs = lib{osimSimulation}
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
 # the version module for details on the version.* variable values.
 #
 if $version.pre_release
-  lib{osimLepton \
-      osimCommon \
-      osimSimulation}: bin.lib.version = "-$version.project_id"
+  lib{osimLepton        \
+      osimCommon        \
+      osimSimulation    \
+      osimActuators}: bin.lib.version = "-$version.project_id"
 else
-  lib{osimLepton \
-      osimCommon \
-      osimSimulation}: bin.lib.version = "-$version.major.$version.minor"
+  lib{osimLepton        \
+      osimCommon        \
+      osimSimulation    \
+      osimActuators}: bin.lib.version = "-$version.major.$version.minor"
 
 # Install into the libopensim/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
