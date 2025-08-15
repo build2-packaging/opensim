@@ -42,6 +42,8 @@ sysinfo = "$osname-$cxx.target.cpu"
 
 ./: lib{osimActuators}: OpenSim/Actuators/{hxx cxx}{** -Test/*}
 
+./: lib{osimAnalyses}: OpenSim/Analyses/{hxx cxx}{** -Test/*}
+
 # Build options.
 
 # Note that none of the macros defined in the upstream build are referenced in
@@ -121,6 +123,23 @@ OpenSim/Actuators/obj{*}:                                                       
     -DSPDLOG_COMPILED_LIB                                                               \
     -DSWIG_PYTHON
 
+OpenSim/Analyses/obj{*}:                                                \
+  cxx.poptions +=                                                       \
+    "-I$src_root/libopensim"                                            \
+    -DOPENSIM_ANALYSES_AUTHORS=\"Clay_Anderson-Ayman_Habib-Peter_Loan\" \
+    -DOPENSIM_ANALYSES_COPYRIGHT_YEARS=\"2005-2017\"                    \
+    -DOPENSIM_ANALYSES_LIBRARY_NAME=osimAnalyses                        \
+    -DOPENSIM_ANALYSES_MAJOR_VERSION="$version.major"                   \
+    -DOPENSIM_ANALYSES_MINOR_VERSION="$version.minor"                   \
+    -DOPENSIM_ANALYSES_BUILD_VERSION="$version.patch"                   \
+    -DOSIMANALYSES_EXPORTS                                              \
+    -DOSIM_COMPILER_INFO="$effect($cxx.path)"                           \
+    -DOSIM_OS_NAME="$osname"                                            \
+    -DOSIM_SYS_INFO="$sysinfo"                                          \
+    -DOSIM_VERSION="$version"                                           \
+    -DSPDLOG_COMPILED_LIB                                               \
+    -DSWIG_PYTHON
+
 # Note that upstream does not build static libraries. I don't think it's
 # supported.
 #
@@ -133,11 +152,15 @@ OpenSim/Simulation/obja{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Static\"
 OpenSim/Actuators/objs{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Shared\"
 OpenSim/Actuators/obja{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Static\"
 
+OpenSim/Analyses/objs{*}: cxx.poptions += -DOPENSIM_ANALYSES_TYPE=\"Shared\"
+OpenSim/Analyses/obja{*}: cxx.poptions += -DOPENSIM_ANALYSES_TYPE=\"Static\"
+
 # Libraries
 #
-lib{osimCommon}: $simbody $spdlog lib{osimLepton}
+lib{osimCommon}:     $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: lib{osimCommon}
-lib{osimActuators}: lib{osimSimulation}
+lib{osimActuators}:  lib{osimSimulation}
+lib{osimAnalyses}:   lib{osimActuators}
 
 # Export options.
 #
@@ -147,6 +170,7 @@ lib{osimLepton}: \
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
 lib{osimActuators}:  cxx.export.libs = lib{osimSimulation}
+lib{osimAnalyses}:   cxx.export.libs = lib{osimActuators}
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
@@ -156,12 +180,14 @@ if $version.pre_release
   lib{osimLepton        \
       osimCommon        \
       osimSimulation    \
-      osimActuators}: bin.lib.version = "-$version.project_id"
+      osimActuators     \
+      osimAnalyses}: bin.lib.version = "-$version.project_id"
 else
   lib{osimLepton        \
       osimCommon        \
       osimSimulation    \
-      osimActuators}: bin.lib.version = "-$version.major.$version.minor"
+      osimActuators     \
+      osimAnalyses}: bin.lib.version = "-$version.major.$version.minor"
 
 # Install into the libopensim/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
