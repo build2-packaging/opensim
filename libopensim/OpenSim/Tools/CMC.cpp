@@ -46,6 +46,12 @@ using SimTK::Vector;
 using namespace OpenSim;
 using namespace SimTK;
 
+template <> struct fmt::formatter<SimTK::Vector_<double>> :
+  ostream_formatter {};
+
+template <> struct fmt::formatter<OpenSim::Array<double>> :
+  ostream_formatter {};
+
 #define MIN_CMC_CONTROL_VALUE 0.02
 #define MAX_CMC_CONTROL_VALUE 1.00
 
