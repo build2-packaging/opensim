@@ -22,6 +22,8 @@
 
 using namespace OpenSim;
 
+template <> struct fmt::formatter<SimTK::Vec<3>> : ostream_formatter {};
+
 void MocoMarkerFinalGoal::initializeOnModelImpl(const Model& model) const {
     m_point.reset(&model.getComponent<Point>(get_point_name()));
     setRequirements(0, 1, SimTK::Stage::Position);

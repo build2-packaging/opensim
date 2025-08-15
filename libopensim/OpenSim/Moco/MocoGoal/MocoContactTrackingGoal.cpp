@@ -22,6 +22,8 @@
 using namespace OpenSim;
 using RefPtrMSF = SimTK::ReferencePtr<const MocoScaleFactor>;
 
+template <> struct fmt::formatter<SimTK::Vec<3>> : ostream_formatter {};
+
 MocoContactTrackingGoalGroup::MocoContactTrackingGoalGroup() {
     constructProperties();
 }
