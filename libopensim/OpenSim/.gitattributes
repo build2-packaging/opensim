@@ -1,4 +1,3 @@
 Actuators symlink=dir
 Analyses  symlink=dir
 Auxiliary symlink=dir
-Tools     symlink=dir
