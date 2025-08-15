@@ -28,6 +28,11 @@
 
 #include "spdlog/sinks/stdout_color_sinks.h"
 
+// Include this to make std::remove(iter, iter, value) visible. Without it g++
+// was finding only std::remove(const char*).
+//
+#include <algorithm>
+
 using namespace OpenSim;
 
 static void initializeLogger(spdlog::logger& l, const char* pattern) {
