@@ -1,4 +1,4 @@
-cxx.std = latest
+cxx.std = 17 # Upstream requires C++17 specifically.
 
 using cxx
 

@@ -1,3 +1,8 @@
-import libs = libopensim%lib{opensim}
+import libs = libopensim%lib{osimTools}
 
-exe{driver}: {hxx ixx txx cxx}{**} $libs testscript{**}
+exe{driver}: cxx{driver} $libs testscript
+
+# See library buildfile for details.
+#
+obj{driver}: cxx.poptions += -DSPDLOG_COMPILED_LIB \
+                             -DSWIG_PYTHON
