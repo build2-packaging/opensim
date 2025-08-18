@@ -35,10 +35,10 @@ sysinfo = "$osname-$cxx.target.cpu"
 ./: lib{osimLepton}: Vendors/lepton/include/hxx{**} \
                      Vendors/lepton/src/{hxx cxx}{*}
 
-./: lib{osimCommon}: OpenSim/h{*}                                               \
+./: lib{osimCommon}: OpenSim/hxx{*}                                             \
                      OpenSim/Common/{hxx cxx}{* -C3DFileAdapter -gcvspl}        \
                      OpenSim/Common/{h c}{gcvspl}                               \
-                     OpenSim/Auxiliary/h{*}
+                     OpenSim/Auxiliary/hxx{*}
 
 ./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/**}
 
@@ -219,11 +219,34 @@ if $version.pre_release
 else
   lib{$all_libs}: bin.lib.version = "-$version.major.$version.minor"
 
-# Install into the libopensim/ subdirectory of, say, /usr/include/
-# recreating subdirectories.
+# By default, install into /usr/include/, recreating subdirectories, which
+# will result in paths such as /usr/include/OpenSim/Common/Foo.h.
 #
-{hxx ixx txx}{*}:
+{hxx h}{*}:
 {
-  install         = include/libopensim/
+  install         = include/
   install.subdirs = true
 }
+
+# Disable installation for certain headers.
+#
+OpenSim/Auxiliary/hxx{*}        \
+OpenSim/hxx{version}@./OpenSim/ \
+Vendors/hxx{*}:
+{
+  install         = false
+  install.subdirs = false # Note: required
+}
+
+# The Lepton headers need to be rearranged a bit.
+#
+Vendors/lepton/include/hxx{Lepton}@./Vendors/lepton/include/: \
+  install = include/OpenSim/
+Vendors/lepton/include/lepton/hxx{*}: \
+  install = include/OpenSim/lepton/
+
+# Note: Unfortunately, unlike the rest of the libraries, lepton headers are
+# included as `lepton/Foo.h` (i.e., no `OpenSim` prefix), so it needs a special
+# pkgconfig.include value.
+#
+lib{osimLepton}: cxx.pkgconfig.include = include/OpenSim/
