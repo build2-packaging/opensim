@@ -35,8 +35,10 @@ sysinfo = "$osname-$cxx.target.cpu"
 ./: lib{osimLepton}: Vendors/lepton/include/hxx{**} \
                      Vendors/lepton/src/{hxx cxx}{*}
 
-./: lib{osimCommon}: OpenSim/Common/{hxx cxx}{* -C3DFileAdapter } \
-                     OpenSim/Common/{h c}{gcvspl}
+./: lib{osimCommon}: OpenSim/h{*}                                               \
+                     OpenSim/Common/{hxx cxx}{* -C3DFileAdapter -gcvspl}        \
+                     OpenSim/Common/{h c}{gcvspl}                               \
+                     OpenSim/Auxiliary/h{*}
 
 ./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/**}
 
