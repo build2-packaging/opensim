@@ -140,13 +140,14 @@ OpenSim/Tools/obj{*}: cxx.poptions +=                                   \
                       -DOSIMTOOLS_EXPORTS                               \
                       $common_poptions
 
-# Note: This library's build has not been updated to use the common
+# Note: This library's upstream build has not been updated to use the common
 # infrastructure used by the other libraries so there are some
 # differences. Define the same macros as above (sans _AUTHORS) even though
 # they're not present upstream to cover us when the upstream build is updated.
 #
 OpenSim/Moco/obj{*}: cxx.poptions +=                                    \
                      "-I$src_root/libopensim"                           \
+                     -DOPENSIM_MOCO_AUTHORS=\"\"                        \
                      -DOPENSIM_MOCO_COPYRIGHT_YEARS=\"2005-2017\"       \
                      -DOPENSIM_MOCO_LIBRARY_NAME=osimMoco               \
                      -DOPENSIM_MOCO_MAJOR_VERSION="$version.major"      \
@@ -190,6 +191,7 @@ lib{osimMoco}:       lib{osimTools}
 #
 lib{osimLepton}: \
   cxx.export.poptions = "-I$src_root/libopensim/Vendors/lepton/include"
+lib{osimCommon}: cxx.export.poptions = "-I$src_base"
 
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
