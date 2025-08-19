@@ -117,6 +117,9 @@ void Body::extendConnectToModel(Model& aModel)
 // GET AND SET
 //=============================================================================
 
+template <> struct fmt::formatter<SimTK::Inertia_<double>> :
+  ostream_formatter {};
+
 //_____________________________________________________________________________
 /**
  * Get the inertia matrix of the body.

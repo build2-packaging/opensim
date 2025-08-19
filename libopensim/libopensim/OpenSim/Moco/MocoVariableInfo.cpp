@@ -21,6 +21,10 @@
 
 using namespace OpenSim;
 
+template <> struct fmt::formatter<OpenSim::MocoInitialBounds> : ostream_formatter {};
+template <> struct fmt::formatter<OpenSim::MocoFinalBounds> : ostream_formatter {};
+template <> struct fmt::formatter<OpenSim::MocoBounds> : ostream_formatter {};
+
 MocoVariableInfo::MocoVariableInfo() {
     constructProperties();
 }

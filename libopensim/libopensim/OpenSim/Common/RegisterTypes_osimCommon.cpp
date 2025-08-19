@@ -61,6 +61,7 @@
 using namespace OpenSim;
 using namespace std;
 
+template <> struct fmt::formatter<SimTK::Vec<3>> : ostream_formatter {};
 
 //_____________________________________________________________________________
 /**

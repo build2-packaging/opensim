@@ -41,6 +41,8 @@ using namespace std;
 using namespace SimTK;
 using namespace OpenSim;
 
+template <> struct fmt::formatter<SimTK::Vector_<double>> :
+  ostream_formatter {};
 
 //=============================================================================
 // CONSTRUCTOR(S) AND DESTRUCTOR

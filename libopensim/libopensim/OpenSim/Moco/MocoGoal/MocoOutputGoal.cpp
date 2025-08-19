@@ -20,6 +20,8 @@
 
 using namespace OpenSim;
 
+template <> struct fmt::formatter<OpenSim::MocoBounds> : ostream_formatter {};
+
 // ============================================================================
 // MocoOutputBase
 // ============================================================================

@@ -22,6 +22,8 @@
 
 using namespace OpenSim;
 
+template <> struct fmt::formatter<OpenSim::MocoBounds> : ostream_formatter {};
+
 MocoParameter::MocoParameter() {
     constructProperties();
     if (getName().empty()) setName("parameter");
