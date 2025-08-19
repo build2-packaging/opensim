@@ -191,8 +191,8 @@ lib{osimMoco}:       lib{osimTools}
 
 # Export options.
 #
-lib{osimLepton}: \
-  cxx.export.poptions = "-I$src_root/libopensim/Vendors/lepton/include"
+lib{osimLepton}: cxx.export.poptions = \
+  "-I$src_root/libopensim/Vendors/lepton/include"
 lib{osimCommon}: cxx.export.poptions = "-I$src_base"
 
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
