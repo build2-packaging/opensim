@@ -1,1 +1,0 @@
-../../../upstream/OpenSim/Common/Assertion.h

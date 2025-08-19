@@ -1,1 +1,0 @@
-../../../../upstream/OpenSim/Moco/MocoGoal/MocoTranslationTrackingGoal.cpp

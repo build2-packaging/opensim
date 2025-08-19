@@ -1,0 +1,1 @@
+../../../../../upstream/OpenSim/Moco/MocoGoal/MocoSumSquaredStateGoal.h

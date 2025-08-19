@@ -1,1 +1,0 @@
-../../../../upstream/OpenSim/Moco/MocoGoal/MocoStepTimeAsymmetryGoal.h

@@ -1,1 +1,0 @@
-../../../upstream/OpenSim/Simulation/BufferedOrientationsReference.cpp

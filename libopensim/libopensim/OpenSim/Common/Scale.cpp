@@ -1,0 +1,1 @@
+../../../../upstream/OpenSim/Common/Scale.cpp

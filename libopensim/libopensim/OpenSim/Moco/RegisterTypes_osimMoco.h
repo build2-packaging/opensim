@@ -1,0 +1,1 @@
+../../../../upstream/OpenSim/Moco/RegisterTypes_osimMoco.h

@@ -1,1 +1,0 @@
-../../../upstream/OpenSim/Common/C3DFileAdapter.cpp
