@@ -1,16 +1,33 @@
 : 1
 name: libopensim
 version: 4.5.2-a.0.z
+# project: SimTK # @@ TODO?
 language: c++
-summary: opensim C++ library
+summary: SimTK OpenSim Musculoskeletal Simulation C++ library
 license: Apache-2.0 ; Apache License 2.0.
 description-file: README.md
 package-description-file: PACKAGE-README.md
 changes-file: CHANGELOG.md
-url: https://example.org/upstream
-email: upstream@example.org
-package-url: https://github.com/build2-packaging/libopensim
+url: https://opensim.stanford.edu
+doc-url: https://opensimconfluence.atlassian.net/wiki/spaces/OpenSim/overview
+src-url: https://github.com/opensim-org/opensim-core
+package-url: https://github.com/build2-packaging/opensim
 package-email: packaging@build2.org ; Mailing list.
+
+# Linux, FreeBSD: No LAPACK or BLAS on CI (for libsimbody).
+#
+builds: none
+
+windows-builds: &windows
+windows-builds: -static ; Static Windows configs not supported (libsimbody)
+windows-build-exclude: windows*-clang*llvm** ; See libsimbody.
+windows-build-exclude: **mingw_w64** ; Not supported.
+windows-build-config: config.bin.lib=shared ; Conserve disk space on CI VMs.
+
+macos-builds: &macos
+macos-builds: -static ; Static macOS builds not supported (test failures).
+macos-build-config: config.bin.lib=shared ; Conserve disk space on CI VMs.
+
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
 depends: spdlog ^1.14.1

@@ -1,42 +1,134 @@
-# Package decisions
+# Warnings emitted by upstream build
 
-- Upstream doesn't seem to use semver (see e.g. git diff 4.4 4.4.1 --
-  OpenSim/Common/C3DFileAdapter.h which breaks bin compat). So probably need
-  to use upstream-version in manifest.
+By default the upstream build emits dozens of warnings, quite a few of which I
+think should be addressed. Like Simbody there is also a lot of noise which
+makes it more likely that people will just ignore warnings. Generally the
+situation is a bit better than Simbody however.
 
-# Upstream build
+Upstream builds their Simbody dependency with just -Wall but OpenSim itself
+with -Wall -Wextra, most probably because with -Wextra Simbody emits ~36,000
+warnings. They also include the Simbody headers with -isystem otherwise the
+OpenSim build emits ~3000 warnings.
 
-if(OPENSIM_DISABLE_STATIC_TYPE_REGISTRATION)
-    add_definitions(-DOPENSIM_DISABLE_STATIC_TYPE_REGISTRATION=1)
-endif()
+# TODO
 
-PLATFORM_NAME (Windows, Mac, Linux...)
+- Some of the upstream tests still fail on some configurations. They are
+  currently disabled. See the libopensim-tests buildfile.
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(PLATFORM_ABI x64)
-else()
-    set(PLATFORM_ABI x86)
-endif()
+- Consider reverting the commits adding mingw-w64 support.
 
-default_build_inst_set
-BUILD_INST_SET
-inst_set_to_use
+  The libopensim/tests/ smoke test passes CI but the upstream tests in
+  libopensim-tests/ fail with "multiple definition" linker errors for some
+  standard library types, primarily std::string. The difference is that the
+  upstream test link against the static catch2 libraries.
 
--funroll-loops
--Wshorten-64-to-32 (Clang)
-add_compile_options($<$<NOT:$<CONFIG:Debug>>:-Wno-unused-variable>
-                    $<$<NOT:$<CONFIG:Debug>>:-Wno-unused-parameter>)
+  Until the upstream tests pass we can't submit the Mingw-w64 support patches
+  upstream so might be a better idea to just revert them. And upstream does
+  not even support Mingw so it's probably not worth it.
 
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
-    NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS "5.0.0"))
-    add_compile_options(-Wno-unused-local-typedefs)
-endif()
+# Patches applied to upstream code
 
-Lots of MSVC-specific compilation options in root CMakeLists.txt
+1) Simulation/Model/TwoFrameLinker.h
 
-if(WIN32)
-    add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-endif()
+   Can't pass a temporary as lvalue reference argument
 
-C++17 is required
+   I think this only gets flagged by Clang 17 (on Windows) and not Clang 19 or
+   any other compilers because an implementation is not required to issue
+   diagnostics unless a template is actually instantiated and this function
+   does not get called from anywhere inside upstream/.
 
+   Reported in upstream issue
+   https://github.com/opensim-org/opensim-core/issues/ 4133
+
+2) Common/Array.h
+
+    "unresolved external" errors for OpenSim::Array<bool>::BoolLike on MSVC
+    17.14.
+
+    Upstream fixed this in what seems like a less reliable way:
+
+      Upstream issue #4081
+      Upstream PR    #4085
+
+    I filed new issue https://github.com/opensim-org/opensim-core/issues/ 4132
+    suggesting that it be done our way instead.
+
+3) README.md (invalid UTF-8 byte)
+
+   Causes bpkg to fail (when called by bdep ci).
+
+   Reported in upstream issue
+   https://github.com/opensim-org/opensim-core/issues/ 4134.
+
+4) Various source files (Add fmt::formatter specializations)
+
+    Upstream targets an old version of fmt which has a `fallback_formatter`
+    template that automatically adds formatting for types with
+    operator<<(ostream&...). But this build2 package uses a newer version of
+    fmt in which fallback_formatter has been deprecated, so do that work
+    ourselves.
+
+    Not reported upstream because this is not a proper fix, just a workaround.
+
+    Looks like upstream started addressing this in commit
+    77ed3884e3f745923d0e790fe3924e5e865cd330, not long after version 4.5.2.
+
+5) Moco/Components/ActuatorInputController.cpp
+
+    Fix missing semicolon.
+
+    This has been fixed in upstream commit
+    05a49223c06c397aeb47c714a5bac90f99468b00.
+
+6) Common/Logger.cpp (Static init order bug)
+
+    Reported in upstream issue
+    https://github.com/opensim-org/opensim-core/issues/ 4127.  The submitted
+    PR https://github.com/opensim-org/opensim-core/pull/ 4131 has been merged
+    to main.
+
+7) Common/Logger.cpp (Missing include)
+
+   This has been fixed in upstream commit
+   77ed3884e3f745923d0e790fe3924e5e865cd330.
+
+8) Common/Logger.h
+
+   Lack of perfect forwarding triggers static assertion failures in fmt
+   library.
+
+   Fixes OpenSim version of spdlog issue 1725:
+   https://github.com/gabime/spdlog issue #1725
+   https://github.com/gabime/spdlog pull  #1726
+
+   Reported in upstream https://github.com/opensim-org/opensim-core/issues/
+   4135.
+
+9) Upstream tests (Unnecessary use of LoadOpenSimLibrary("osimActuators"))
+
+   Reported in upstream issue
+   https://github.com/opensim-org/opensim-core/issues/ 4139. Submitted PR
+   https://github.com/opensim-org/opensim-core/pull/ 4143.
+
+# Other issues to keep an eye on
+
+1) Simbody issue #836: Relational operators pollute SimTK namespace
+
+   https://github.com/simbody/simbody/issues/ 836
+
+   We work around this in the buildfile by passing `-DSWIG_PYTHON` (see
+   comments there for details).
+
+2) spdlog build2 package issue #22: Shouldn't SPDLOG_COMPILED_LIB be exported?
+
+   https://github.com/build2-packaging/spdlog/issues/ 22
+
+   We work around this by exporting `SPDLOG_COMPILED_LIB` in our OpenSim
+   package (see `libopensim` buildfile).
+
+3) Bad assertion in Array<T>::remove(i)
+
+   Reported upstream at https://github.com/opensim-org/opensim-core/issues/
+   4138. Has been fixed in the meantime but not released yet.
+
+   Our workaround it to define NDEBUG and to export it from lib{osimCommon}.
