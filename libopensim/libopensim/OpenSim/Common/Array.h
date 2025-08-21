@@ -572,7 +572,7 @@ private:
 
     // backwards-compat hack: the original implementation allows for references
     // to booleans, which won't work if using std::vector<bool> specialization
-    class BoolLike final {
+    class OSIMCOMMON_API BoolLike final {
     public:
         BoolLike(bool value_) : value{value_} {}
         operator bool& () { return value; }
