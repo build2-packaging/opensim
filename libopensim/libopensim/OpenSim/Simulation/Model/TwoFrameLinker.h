@@ -605,7 +605,8 @@ void TwoFrameLinker<C, F>::addInPhysicalForcesFromInternal(
         SimTK::Vector_<SimTK::SpatialVec>* _physicalForces;
     };
 
-    producePhysicalForcesFromInternal(s, f, Adaptor{physicalForces});
+    Adaptor a{physicalForces};
+    producePhysicalForcesFromInternal(s, f, a);
 }
 
 template<class C, class F>
