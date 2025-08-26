@@ -41,7 +41,7 @@ class Model;
 
 // Excluding this from Doxygen. -Sam Hamner
     /// @cond
-class CMCActuatorSystemRep : public SimTK::System::Guts {
+class OSIMSIMULATION_API CMCActuatorSystemRep : public SimTK::System::Guts {
     public:
     CMCActuatorSystemRep() : SimTK::System::Guts( "CMCActuatorSystem", "2.0") {}
     
@@ -55,7 +55,7 @@ class CMCActuatorSystemRep : public SimTK::System::Guts {
     SimTK_DOWNCAST( CMCActuatorSystemRep, SimTK::System::Guts );
 };
 
-class CMCActuatorSystem : public SimTK::System {
+class OSIMSIMULATION_API CMCActuatorSystem : public SimTK::System {
    public:
    explicit CMCActuatorSystem() {
        adoptSystemGuts( new CMCActuatorSystemRep() );
@@ -65,7 +65,7 @@ class CMCActuatorSystem : public SimTK::System {
    SimTK_PIMPL_DOWNCAST( CMCActuatorSystem, System );
 };
 
-class CMCActuatorSubsystemRep : public SimTK::Subsystem::Guts {
+class OSIMSIMULATION_API CMCActuatorSubsystemRep : public SimTK::Subsystem::Guts {
 
   public:
   CMCActuatorSubsystemRep( Model* model);
