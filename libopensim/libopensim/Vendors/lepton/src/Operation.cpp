@@ -30,7 +30,16 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
+// If the compiler is MSVC then MSVC_erfc.h will define M_PI (otherwise it
+// does nothing at all). But on MinGW we need to make M_PI available by
+// defining _USE_MATH_DEFINES before <cmath> is included (by
+// lepton/Operation.h in this case).
+//
+#ifdef __MINGW32__
+#  define _USE_MATH_DEFINES
+#endif
 #include "lepton/Operation.h"
+
 #include "lepton/ExpressionTreeNode.h"
 #include "MSVC_erfc.h"
 
