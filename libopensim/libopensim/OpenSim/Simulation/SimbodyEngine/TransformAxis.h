@@ -57,8 +57,8 @@ public:
     generalized coordinate names that serve as the independent variables of
     the transform function. **/
     OpenSim_DECLARE_LIST_PROPERTY(coordinates, std::string,
-        "Names of the coordinates that serve as the independent variables \
-        of the transform function.");
+        "Names of the coordinates that serve as the independent variables "
+        "of the transform function.");
 
     /** The "axis" property holds the axis direction of the rotation or 
     translation axis of the transform as a Vec3. **/
@@ -70,8 +70,8 @@ public:
     about/along the specified axis. If none is specified a Constant function
     is applied. **/
     OpenSim_DECLARE_PROPERTY(function, Function,
-       "Transform function of the generalized coordinates used to \
-       represent the amount of displacement along a specified axis.");
+       "Transform function of the generalized coordinates used to "
+       "represent the amount of displacement along a specified axis.");
 
 //==============================================================================
 // PUBLIC METHODS
