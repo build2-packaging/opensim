@@ -212,6 +212,12 @@ if ($cxx.class == 'gcc')
                           -Wno-unused-local-typedefs    \
                           -Wno-unused-variable          \
                           -Wno-unused-parameter
+
+  # Upstream makes a lot of use of #pragma warning but it is not supported by
+  # g++.
+  #
+  if ($cxx.target.class == 'windows')
+    obj{*}: cxx.coptions += -Wno-unknown-pragmas
 }
 
 # "-Wshorten-64-to-32 helps us catch default warnings from Visual C++."

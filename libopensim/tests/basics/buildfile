@@ -6,3 +6,11 @@ exe{driver}: cxx{driver} $libs testscript
 #
 obj{driver}: cxx.poptions += -DSPDLOG_COMPILED_LIB \
                              -DSWIG_PYTHON
+
+if ($cxx.class == 'gcc' && $cxx.target.class == 'windows')
+{
+  # Upstream makes a lot of use of #pragma warning but it is not supported by
+  # g++.
+  #
+  obj{driver}: cxx.coptions += -Wno-unknown-pragmas
+}
