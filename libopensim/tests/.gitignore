@@ -1,6 +1,8 @@
 # Test executables.
 #
 driver
+upstream-tests/test*
+!upstream-tests/*testscript
 
 # Testscript output directories (can be symlinks).
 #

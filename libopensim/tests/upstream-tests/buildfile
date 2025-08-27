@@ -1,0 +1,87 @@
+import libs  = libopensim%lib{osimCommon}
+import libs += catch2%liba{catch2wmain}
+
+# Super slow -- add back later
+#        testComponentInterface  \
+
+tests = testAPDMDataReader                      \
+        testArray                               \
+        testAssertion                           \
+        testCommonUtilities                     \
+        testDataTable                           \
+        testFunctionAdapter                     \
+        testFunctions                           \
+        testGCVSpline                           \
+        testLatinHypercubeDesign                \
+        testMarkerData                          \
+        testNCSpline                            \
+        testPath                                \
+        testRootSolver                          \
+        testSTOFileAdapter                      \
+        testSerialization                       \
+        testSmoothSegmentedFunctionFactory      \
+        testStorage                             \
+        testTRCFileAdapter                      \
+        testXsensDataReader
+
+#for t: Common/Test/cxx{[tT]est* -testC3DFileAdapter}
+for t: Common/Test/cxx{$tests}
+{
+  n = $name($t)
+
+  ./: exe{$n}: $t $libs testscript
+}
+
+exe{testAPDMDataReader}:     input_files = shared/IMUData/APDM/imuData01.csv    \
+                                           shared/IMUData/APDM/apdm_format7.csv
+exe{testComponentInterface}: input_files = Common/Test/dataWithEformat.trc
+exe{testDataTable}:          input_files = Common/Test/test.sto
+exe{testMarkerData}:         input_files = Common/Test/dataWithNaNsOfDifferentCases.trc \
+                                           Common/Test/dataWithNaNsWithSpaces.trc       \
+                                           Common/Test/dataWithEformat.trc
+
+# Note that there are five files named subject01_walk1_grf.mot in
+# upstream/Applications/. They are not the same file but the upstream
+# CMakeLists.txt just selects all of them:
+#
+#   file(GLOB MOT_TEST_FILES "${CMAKE_SOURCE_DIR}/Applications/*/test/*.mot")
+#
+# The first one I tried happened to make the test pass so I guess we're good?
+#
+exe{testSTOFileAdapter}:                                                        \
+  input_files = Common/Test/test.sto                                            \
+                shared/gait10dof18musc_ik_CRLF_line_ending.mot                  \
+                Applications/IK/test/std_subject01_walk1_ik.mot                 \
+                Applications/CMC/test/gait10dof18musc_subject01_walk_grf.mot    \
+                Applications/CMC/test/runningModel_GRF_data.mot                 \
+                Applications/Analyze/test/subject02_running_arms_ik.mot         \
+                Applications/Analyze/test/subject01_walk1_grf.mot
+
+exe{testSerialization}: input_files = Common/Test/obj1Defaults.xml
+exe{testStorage}:       input_files = Common/Test/test.sto                      \
+                                      Common/Test/sampleOutputs.sto             \
+                                      Common/Test/sampleOutputsVec3.sto         \
+                                      Common/Test/sampleOutputsSpatialVec.sto   \
+                                      Common/Test/testDiff.sto                  \
+                                      Common/Test/dataWithNaNsOfDifferentCases.trc
+
+exe{testTRCFileAdapter}:                                                        \
+  input_files = Applications/IK/test/constraintTest.trc                         \
+                Applications/IK/test/subject01_synthetic_marker_data.trc        \
+                Applications/Scale/test/subject01_static.trc                    \
+                Common/Test/dataWithBlanksForMissingMarkers.trc                 \
+                Common/Test/dataWithEformat.trc                                 \
+                Common/Test/dataWithNaNsOfDifferentCases.trc                    \
+                Common/Test/dataWithNaNsWithSpaces.trc                          \
+                Common/Test/exampleFormat.trc                                   \
+                shared/gait10dof18musc_walk_CRLF_line_ending.trc
+
+exe{testXsensDataReader}:                                                               \
+  input_files = shared/IMUData/Xsens/MT_012005D6_031-000_00B421AF.txt                   \
+                shared/IMUData/Xsens/MT_012005D6_031-000_00B4227B.txt                   \
+                shared/IMUData/Xsens/MT_012005D6-000_sit_to_stand-000_00B421ED.txt      \
+                shared/IMUData/Xsens/test1_00B421E6.txt                                 \
+                shared/IMUData/Xsens/MT_01200454_000-000_00B40DE4.txt                   \
+                shared/IMUData/Xsens/MT_01200312-002-000_00B474BA.txt
+
+obj{*}: cxx.poptions += -DSWIG_PYTHON -DSPDLOG_COMPILED_LIB

@@ -1,0 +1,12 @@
+# Symlink input files into working directory.
+#
+#   --no-cleanup: Don't register file for cleanup
+#
+for f: $input_files
+  ln -s --no-cleanup $src_base/$f ./
+end;
+
+# Register all files in working directory for cleanup (if any exist); redirect
+# stdout and stderr to /dev/null.
+#
+$* &?$~/* >- 2>!
