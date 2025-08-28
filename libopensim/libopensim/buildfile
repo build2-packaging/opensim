@@ -66,14 +66,14 @@ compiler_info = [dir_path] $regex.replace($compiler_info, '\\', '\\\\')
 common_poptions = -DOSIM_COMPILER_INFO=\""$compiler_info"\"     \
                   -DOSIM_OS_NAME="$osname"                      \
                   -DOSIM_SYS_INFO="$sysinfo"                    \
-                  -DOSIM_VERSION="$version"
+                  -DOSIM_VERSION="$(version.major).$(version.minor).$(version.patch)"
 
 # @@ TODO Pretty sure this should be exported from lib{spdlog}. See
-#    https://github.com/build2-packaging/spdlog/issues/22.
+#    https://github.com/build2-packaging/spdlog/issues/ 22.
 #
 common_poptions += -DSPDLOG_COMPILED_LIB
 
-# Work around Simbody bug https://github.com/simbody/simbody/issues/836.
+# Work around Simbody bug https://github.com/simbody/simbody/issues/ 836.
 #
 # Note that without -DSWIG_PYTHON the problematic relops described in that
 # issue are enabled in my case (g++ 14.2) because
@@ -88,6 +88,15 @@ common_poptions += -DSPDLOG_COMPILED_LIB
 # it's the least intrusive solution. @@ TODO Reconsider?
 #
 common_poptions += -DSWIG_PYTHON
+
+# Always define NDEBUG because upstream contains incorrect assertions such as
+# "i > 0" in Array<T>::remove(i) in Common/Array.h. The upstream build always
+# adds -DNDEBUG except for debug builds which is probably why they haven't
+# noticed this. The default CMAKE_BUILD_TYPE is ReleaseWithDebugInfo, so with
+# -DNDEBUG and they seem to CI the release build. See upstream issue
+# https://github.com/opensim-org/opensim-core/issues/ 4138.
+#
+common_poptions += -DNDEBUG
 
 if ($cxx.target.class == 'windows')
   common_poptions += -D_CRT_SECURE_NO_DEPRECATE
@@ -231,8 +240,8 @@ if ($cxx.id.type == 'clang')
 
 # C4068: unknown pragma (from upstream build)
 #
-# @@ TODO Upstream passes /GS- which disables buffer overrun checking. Seems
-#    like a bad idea so leaving it on for now.
+# Note: upstream passes /GS- which disables buffer overrun checking. Seems
+# like a bad idea so leaving it enabled for now.
 #
 if ($cxx.class == 'msvc')
 {
@@ -254,7 +263,19 @@ lib{osimMoco}:       lib{osimTools}
 #
 lib{osimLepton}: cxx.export.poptions = \
   "-I$src_root/libopensim/Vendors/lepton/include"
-lib{osimCommon}: cxx.export.poptions = "-I$src_base"
+
+# NDEBUG: See above for background. We have to export it as well otherwise
+# Array<T>::remove(0) will abort if Array<T> is not instantiated inside
+# osimCommon. This can be demonstrated with the testStatesTrajectory test. If
+# this export is remove that test will fail due to the bad assertion in
+# Array<T>::remove().
+#
+#   @@ TODO Remove the NDEBUG export once upstream issue
+#   https://github.com/opensim-org/opensim-core/issues/ 4138 has been
+#   resolved.
+#
+lib{osimCommon}: cxx.export.poptions = "-I$src_base" \
+                                       -DNDEBUG
 
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
