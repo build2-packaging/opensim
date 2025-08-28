@@ -1,7 +1,7 @@
 import common      = libopensim%lib{osimCommon}
 import simulation  = libopensim%lib{osimSimulation}
-import analyses    = libopensim%lib{osimAnalyses}
 import actuators   = libopensim%lib{osimActuators}
+import analyses    = libopensim%lib{osimAnalyses}
 import tools       = libopensim%lib{osimTools}
 
 import catch2 = catch2%liba{catch2}
@@ -61,6 +61,11 @@ for t: Actuators/Test/cxx{testDeGrooteFregly2016Muscle                  \
                           testModelProcessor                            \
                           testMuscles}
   ./: exe{$name($t)}: $t $tools $catch2_main testscript
+
+# Analyses tests.
+#
+for t: Analyses/Test/cxx{testOutputReporter}
+  ./: exe{$name($t)}: $t $analyses $catch2_main testscript
 
 # Disable some tests.
 #
