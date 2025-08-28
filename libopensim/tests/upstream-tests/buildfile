@@ -1,37 +1,120 @@
-import libs  = libopensim%lib{osimCommon}
-import libs += catch2%liba{catch2wmain}
+import common      = libopensim%lib{osimCommon}
+import simulation  = libopensim%lib{osimSimulation}
+import analyses    = libopensim%lib{osimAnalyses}
 
-# Super slow -- add back later
-#        testComponentInterface  \
+import catch2 = catch2%liba{catch2}
+import catch2_main = catch2%liba{catch2wmain}
 
-tests = testAPDMDataReader                      \
-        testArray                               \
-        testAssertion                           \
-        testCommonUtilities                     \
-        testDataTable                           \
-        testFunctionAdapter                     \
-        testFunctions                           \
-        testGCVSpline                           \
-        testLatinHypercubeDesign                \
-        testMarkerData                          \
-        testNCSpline                            \
-        testPath                                \
-        testRootSolver                          \
-        testSTOFileAdapter                      \
-        testSerialization                       \
-        testSmoothSegmentedFunctionFactory      \
-        testStorage                             \
-        testTRCFileAdapter                      \
-        testXsensDataReader
+# The upstream test source files are spread over many different directory
+# subtrees and so are the input files many of them require. The input files
+# required for a test are often located in different subtrees.
+#
+# All input data files need to be in the test's working directory which we set
+# up in the testscript.
 
-#for t: Common/Test/cxx{[tT]est* -testC3DFileAdapter}
-for t: Common/Test/cxx{$tests}
-{
-  n = $name($t)
+# testC3DFileAdapter: Compilation failure
+#
+for t: Common/Test/cxx{[tT]est* -testC3DFileAdapter}
+  ./: exe{$name($t)}: $t $common $catch2_main testscript
 
-  ./: exe{$n}: $t $libs testscript
-}
+# Simulation tests (with own main)
+#
+for t: Simulation/Test/cxx{testNestedModelComponents    \
+                           testManager                  \
+                           testPoints                   \
+                           testProbes                   \
+                           testMomentArms               \
+                           testMuscleMetabolicsProbes   \
+                           testPrescribedForce          \
+                           testStatesTrajectory         \
+                           testSimulationUtilities      \
+                           testModelInterface           \
+                           testReportersWithModel}
+  ./: exe{$name($t)}: $t $analyses $catch2 testscript
 
+# Simulation tests (without own main)
+#
+for t: Simulation/Test/cxx{testInverseKinematicsSolver  \
+                           testStationDefinedFrame      \
+                           testTableProcessor           \
+                           testContactGeometry          \
+                           testPointToPointSpring       \
+                           testInitState                \
+                           testAssemblySolver           \
+                           testFrames                   \
+                           testForceProducer            \
+                           testStatesDocument}
+  ./: exe{$name($t)}: $t $analyses $catch2_main testscript
+
+# Disable some tests.
+#
+# testStationDefinedFrame: Fails complaining about NaN values. Based on git
+# history looks like it was recently fixed and it works in the upstream build
+# but not for us. [@@ TODO Passes now with NDEBUG defined but I think there
+# were other failures--are these now getting masked?; see libopensim buildfile
+# for details.]
+#
+# testComponentInterface, testContactGeometry, testAssemblySolver: Very slow.
+#
+# testForces: Segfault
+#
+exe{testComponentInterface      \
+    testContactGeometry         \
+    testAssemblySolver          \
+    testForces}: test = false
+
+# Simulation tests input files
+
+exe{testNestedModelComponents}: input_files = Simulation/Test/double_pendulum.osim
+exe{testManager}:               input_files = Simulation/Test/arm26.osim
+exe{testPoints}:                input_files = Simulation/Test/double_pendulum.osim
+exe{testMomentArms}:                                                            \
+  input_files = Simulation/Test/BothLegs22.osim                                 \
+                Simulation/Test/testMomentArmsConstraintB.osim                  \
+                Simulation/Test/testMomentArmsConstraintA.osim                  \
+                Simulation/Test/MovingPathPointMomentArmTest.osim               \
+                Simulation/Test/gait2354_simbody.osim                           \
+                Simulation/Test/wrist_mass.osim                                 \
+                Simulation/Test/P2PBallJointMomentArmTest.osim                  \
+                Simulation/Test/P2PBallCustomJointMomentArmTest.osim            \
+                Simulation/Test/P2PCustomJointMomentArmTest.osim                \
+                Simulation/Test/MovingPointCustomJointMomentArmTest.osim        \
+                Simulation/Test/WrapPathCustomJointMomentArmTest.osim           \
+                Simulation/Test/PathOnConstrainedBodyMomentArmTest.osim         \
+                Simulation/Test/MultipleMPPsMomentArmTest.osim                  \
+                Simulation/Test/CoupledCoordinatesMPPsMomentArmTest.osim
+
+exe{testStationDefinedFrame}: \
+  input_files = Simulation/Test/StationDefinedFrames_Basic.osim \
+                Simulation/Test/StationDefinedFrames_Advanced.osim
+
+exe{testContactGeometry}:                               \
+  input_files = Simulation/Test/sphere_10cm_radius.obj  \
+                Simulation/Test/sphere_10cm_radius.stl  \
+                Simulation/Test/sphere_10cm_radius.vtp
+
+exe{testStatesTrajectory}: input_files = Simulation/Test/gait2354_simbody.osim  \
+                                         Simulation/Test/arm26.osim             \
+                                         shared/std_subject01_walk1_states.sto
+
+exe{testInitState}: input_files = Simulation/Test/arm26.osim
+
+exe{testSimulationUtilities}:                                                   \
+  input_files = Simulation/Test/testSimulationUtilities_leg6dof9musc_20303.osim \
+                Simulation/Test/testSimulationUtilities_leg69_IK_stance_pre4.mot
+
+exe{testAssemblySolver}:                                                        \
+  input_files = Simulation/Test/knee_patella_ligament.osim                      \
+                Simulation/Test/PushUpToesOnGroundExactConstraints.osim         \
+                Simulation/Test/PushUpToesOnGroundLessPreciseConstraints.osim   \
+                Simulation/Test/PushUpToesOnGroundWithMuscles.osim
+
+exe{testModelInterface}: input_files = Simulation/Test/arm26.osim
+exe{testFrames}:         input_files = Simulation/Test/double_pendulum.osim
+
+
+# Common tests input files
+#
 exe{testAPDMDataReader}:     input_files = shared/IMUData/APDM/imuData01.csv    \
                                            shared/IMUData/APDM/apdm_format7.csv
 exe{testComponentInterface}: input_files = Common/Test/dataWithEformat.trc
