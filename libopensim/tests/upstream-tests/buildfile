@@ -1,6 +1,8 @@
 import common      = libopensim%lib{osimCommon}
 import simulation  = libopensim%lib{osimSimulation}
 import analyses    = libopensim%lib{osimAnalyses}
+import actuators   = libopensim%lib{osimActuators}
+import tools       = libopensim%lib{osimTools}
 
 import catch2 = catch2%liba{catch2}
 import catch2_main = catch2%liba{catch2wmain}
@@ -12,6 +14,8 @@ import catch2_main = catch2%liba{catch2wmain}
 # All input data files need to be in the test's working directory which we set
 # up in the testscript.
 
+# Common tests.
+#
 # testC3DFileAdapter: Compilation failure
 #
 for t: Common/Test/cxx{[tT]est* -testC3DFileAdapter}
@@ -46,6 +50,18 @@ for t: Simulation/Test/cxx{testInverseKinematicsSolver  \
                            testStatesDocument}
   ./: exe{$name($t)}: $t $analyses $catch2_main testscript
 
+# Actuators tests.
+#
+for t: Actuators/Test/cxx{testDeGrooteFregly2016Muscle                  \
+                          testMuscleFirstOrderActivationDynamicModel    \
+                          testMuscleFixedWidthPennationModel            \
+                          testSerializableMuscleCurves                  \
+                          testPolynomialPathFitter                      \
+                          testActuators                                 \
+                          testModelProcessor                            \
+                          testMuscles}
+  ./: exe{$name($t)}: $t $tools $catch2_main testscript
+
 # Disable some tests.
 #
 # testStationDefinedFrame: Fails complaining about NaN values. Based on git
@@ -58,10 +74,13 @@ for t: Simulation/Test/cxx{testInverseKinematicsSolver  \
 #
 # testForces: Segfault
 #
+# testModelProcessor: Test failures
+#
 exe{testComponentInterface      \
     testContactGeometry         \
     testAssemblySolver          \
-    testForces}: test = false
+    testForces                  \
+    testModelProcessor}: test = false
 
 # Simulation tests input files
 
@@ -111,7 +130,6 @@ exe{testAssemblySolver}:                                                        
 
 exe{testModelInterface}: input_files = Simulation/Test/arm26.osim
 exe{testFrames}:         input_files = Simulation/Test/double_pendulum.osim
-
 
 # Common tests input files
 #
