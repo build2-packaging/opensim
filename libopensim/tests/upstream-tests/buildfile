@@ -67,6 +67,17 @@ for t: Actuators/Test/cxx{testDeGrooteFregly2016Muscle                  \
 for t: Analyses/Test/cxx{testOutputReporter}
   ./: exe{$name($t)}: $t $analyses $catch2_main testscript
 
+# Tools tests.
+#
+for t: Tools/Test/cxx{testVisualization \
+                      testModelCopy     \
+                      testSerializeOpenSimObjects}
+  ./: exe{$name($t)}: $t $tools $catch2 testscript
+
+for t: Tools/Test/cxx{testControllers   \
+                      testExternalLoads}
+  ./: exe{$name($t)}: $t $tools $catch2_main testscript
+
 # Disable some tests.
 #
 # testStationDefinedFrame: Fails complaining about NaN values. Based on git
@@ -77,7 +88,7 @@ for t: Analyses/Test/cxx{testOutputReporter}
 #
 # testComponentInterface, testContactGeometry, testAssemblySolver: Very slow.
 #
-# testForces: Segfault
+# testForces, testControllers: Segfault
 #
 # testModelProcessor: Test failures
 #
@@ -85,7 +96,32 @@ exe{testComponentInterface      \
     testContactGeometry         \
     testAssemblySolver          \
     testForces                  \
-    testModelProcessor}: test = false
+    testModelProcessor          \
+    testControllers}: test = false
+
+
+# Tools tests input files.
+#
+exe{testVisualization}: input_files = Tools/Test/BuiltinGeometry.osim           \
+                                      Tools/Test/vis_BuiltinGeometry.txt        \
+                                      Tools/Test/vis_AppearanceTest.txt         \
+                                      Tools/Test/double_pendulum33.osim         \
+                                      Tools/Test/doubletransform33.osim         \
+                                      Tools/Test/visualize_contacts.osim        \
+                                      Tools/Test/test_wrapAllVis.osim           \
+                                      Tools/Test/cylinder.vtp                   \
+                                      Tools/Test/block.vtp                      \
+                                      Tools/Test/sphere.vtp
+
+exe{testControllers}: input_files = Tools/Test/arm26.osim                       \
+                                    Tools/Test/testControllers_TugOfWar.osim    \
+                                    Tools/Test/arm26_controls.xml
+
+exe{testModelCopy}: input_files = Tools/Test/arm26.osim \
+                                  Tools/Test/Neck3dof_point_constraint.osim
+
+exe{testExternalLoads}: input_files = Tools/Test/Pendulum.osim  \
+                                      Tools/Test/ExternalLoadsInSubdir/
 
 # Simulation tests input files
 
