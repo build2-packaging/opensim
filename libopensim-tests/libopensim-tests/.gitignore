@@ -1,9 +1,15 @@
 # Test executables.
 #
-test*
-!testscript
+/test*
 
 # Testscript output directories (can be symlinks).
 #
 test
 test-*
+
+# Include upstream test data files with .obj extension by undoing ingore in
+# higher-up directory.
+#
+!/OpenSim/Simulation/Test/sphere.obj
+!/OpenSim/Simulation/Test/sphere_10cm_radius.obj
+!/OpenSim/Simulation/Test/cube.obj
