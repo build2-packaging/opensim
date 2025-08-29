@@ -1,8 +1,8 @@
 : 1
 name: libopensim
 version: 4.5.2-a.0.z
-# project: SimTK # @@ TODO?
 language: c++
+project: opensim
 summary: SimTK OpenSim Musculoskeletal Simulation C++ library
 license: Apache-2.0 ; Apache License 2.0.
 description-file: README.md
@@ -32,4 +32,4 @@ depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
 depends: spdlog ^1.14.1
 depends: libsimbody ^3.8.0-
-depends: catch2 ^3.7.1
+tests: libopensim-tests == $

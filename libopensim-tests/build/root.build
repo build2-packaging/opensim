@@ -1,0 +1,18 @@
+# Uncomment to suppress warnings coming from external libraries.
+#
+#cxx.internal.scope = current
+
+cxx.std = 17 # Upstream requires C++17 specifically.
+
+using cxx
+
+hxx{*}: extension = h
+ixx{*}: extension = ipp
+txx{*}: extension = tpp
+cxx{*}: extension = cpp
+
+# The test target for cross-testing (running tests under Wine, etc).
+#
+test.target = $cxx.target
+
+exe{*}: test = true

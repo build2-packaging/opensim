@@ -1,0 +1,16 @@
+: 1
+name: libopensim-tests
+version: 4.5.2-a.0.z
+type: exe
+language: c++
+project: opensim
+summary: Upstream tests for libopensim
+license: Apache-2.0 ; Apache License 2.0.
+url: https://opensim.stanford.edu
+doc-url: https://opensimconfluence.atlassian.net/wiki/spaces/OpenSim/overview
+src-url: https://github.com/opensim-org/opensim-core
+package-url: https://github.com/build2-packaging/opensim
+package-email: packaging@build2.org ; Mailing list.
+depends: * build2 >= 0.17.0
+depends: * bpkg >= 0.17.0
+depends: catch2 ^3.7.1

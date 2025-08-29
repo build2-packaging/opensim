@@ -1,0 +1,9 @@
+# Test executables.
+#
+test*
+!testscript
+
+# Testscript output directories (can be symlinks).
+#
+test
+test-*
