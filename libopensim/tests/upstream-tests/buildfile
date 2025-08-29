@@ -18,65 +18,34 @@ import catch2_main = catch2%liba{catch2wmain}
 #
 # testC3DFileAdapter: Compilation failure
 #
-for t: Common/Test/cxx{[tT]est* -testC3DFileAdapter}
+for t: Common/Test/cxx{test* -testC3DFileAdapter}
   ./: exe{$name($t)}: $t $common $catch2_main testscript
 
-# Simulation tests (with own main)
+# Simulation tests.
 #
-for t: Simulation/Test/cxx{testNestedModelComponents    \
-                           testManager                  \
-                           testPoints                   \
-                           testProbes                   \
-                           testMomentArms               \
-                           testMuscleMetabolicsProbes   \
-                           testPrescribedForce          \
-                           testStatesTrajectory         \
-                           testSimulationUtilities      \
-                           testModelInterface           \
-                           testReportersWithModel}
-  ./: exe{$name($t)}: $t $analyses $catch2 testscript
-
-# Simulation tests (without own main)
-#
-for t: Simulation/Test/cxx{testInverseKinematicsSolver  \
-                           testStationDefinedFrame      \
-                           testTableProcessor           \
-                           testContactGeometry          \
-                           testPointToPointSpring       \
-                           testInitState                \
-                           testAssemblySolver           \
-                           testFrames                   \
-                           testForceProducer            \
-                           testStatesDocument}
-  ./: exe{$name($t)}: $t $analyses $catch2_main testscript
+for t: Simulation/Test/cxx{test*}
+{
+  ./: exe{$name($t)}: $t $analyses testscript
+  exe{$name($t)}: $catch2_main: bin.whole = false # Some provide own mains.
+}
 
 # Actuators tests.
 #
-for t: Actuators/Test/cxx{testDeGrooteFregly2016Muscle                  \
-                          testMuscleFirstOrderActivationDynamicModel    \
-                          testMuscleFixedWidthPennationModel            \
-                          testSerializableMuscleCurves                  \
-                          testPolynomialPathFitter                      \
-                          testActuators                                 \
-                          testModelProcessor                            \
-                          testMuscles}
+for t: Actuators/Test/cxx{test*}
   ./: exe{$name($t)}: $t $tools $catch2_main testscript
 
 # Analyses tests.
 #
-for t: Analyses/Test/cxx{testOutputReporter}
+for t: Analyses/Test/cxx{test*}
   ./: exe{$name($t)}: $t $analyses $catch2_main testscript
 
 # Tools tests.
 #
-for t: Tools/Test/cxx{testVisualization \
-                      testModelCopy     \
-                      testSerializeOpenSimObjects}
-  ./: exe{$name($t)}: $t $tools $catch2 testscript
-
-for t: Tools/Test/cxx{testControllers   \
-                      testExternalLoads}
-  ./: exe{$name($t)}: $t $tools $catch2_main testscript
+for t: Tools/Test/cxx{test*}
+{
+  ./: exe{$name($t)}: $t $tools testscript
+  exe{$name($t)}: $catch2_main: bin.whole = false # Some provide own mains.
+}
 
 # Disable some tests.
 #
