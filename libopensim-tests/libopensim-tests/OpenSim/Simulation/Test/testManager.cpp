@@ -44,9 +44,9 @@ Manager Tests:
 #include <OpenSim/Simulation/SimbodyEngine/FreeJoint.h>
 #include <OpenSim/Auxiliary/auxiliaryTestFunctions.h>
 #include <OpenSim/Simulation/Manager/Manager.h>
-#include <OpenSim/Common/LoadOpenSimLibrary.h>
 #include <OpenSim/Simulation/Control/PrescribedController.h>
 #include <OpenSim/Common/Constant.h>
+#include <OpenSim/Actuators/PointActuator.h>
 
 using namespace OpenSim;
 using namespace std;
@@ -59,6 +59,13 @@ void testExceptions();
 
 int main()
 {
+    // The following model(s) contains Actuators that are registered when the
+    // osimActuators library is loaded. But unless we call at least one
+    // function defined in the osimActuators library, some linkers will omit
+    // its dependency from the executable and it will not be loaded at
+    // startup.
+    { PointActuator t; }
+
     SimTK::Array_<std::string> failures;
 
     try { testStationCalcWithManager(); }
@@ -278,7 +285,6 @@ void testStateChangesBetweenIntegration()
 void testExcitationUpdatesWithManager()
 {
     cout << "Running testExcitationUpdatesWithManager" << endl;
-    LoadOpenSimLibrary("osimActuators");
     Model arm("arm26.osim");
 
     const Set<Muscle> &muscleSet = arm.getMuscles();
@@ -453,7 +459,6 @@ void testIntegratorInterface()
 void testExceptions()
 {
     cout << "Running testExceptions" << endl;
-    LoadOpenSimLibrary("osimActuators");
     Model arm1("arm26.osim");
     Model arm2("arm26.osim");
 
