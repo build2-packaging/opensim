@@ -1,7 +1,7 @@
 import spdlog  = spdlog%lib{spdlog}
 import simbody = libsimbody%lib{SimTKsimbody}
 
-# Determines the OS name and system info to be used for the OSIM_OS_NAME and
+# Determine the OS name and system info to be used for the OSIM_OS_NAME and
 # OSIM_SYS_INFO macros. Note that these are only used in Common/About.cpp so
 # are only for informational purposes and thus not super important.
 
@@ -48,11 +48,22 @@ sysinfo = "$osname-$cxx.target.cpu"
 
 ./: lib{osimTools}: OpenSim/Tools/{hxx cxx}{** -Test/**}
 
+# Note: We don't enable CasADi support but do arrange for the sources to be
+#       distributed. Note that we exclude all of MocoCasADiSolver/ except
+#       MocoCasADiSolver.{h,cpp}.
+#
 ./: lib{osimMoco}: OpenSim/Moco/{hxx cxx}{** -MocoCasADiSolver/* -Test/**}
+lib{osimMoco}: OpenSim/Moco/MocoCasADiSolver/{hxx cxx}{MocoCasADiSolver}
+lib{osimMoco}: OpenSim/Moco/MocoCasADiSolver/{hxx cxx}{* -MocoCasADiSolver}: \
+  include = adhoc
 
 # Build options.
 
-common_poptions = -DOSIM_COMPILER_INFO="$effect($cxx.path)"     \
+compiler_info = [dir_path] $effect($cxx.path)
+# Escape backslashes on Windows
+compiler_info = [dir_path] $regex.replace($compiler_info, '\\', '\\\\')
+
+common_poptions = -DOSIM_COMPILER_INFO=\""$compiler_info"\"     \
                   -DOSIM_OS_NAME="$osname"                      \
                   -DOSIM_SYS_INFO="$sysinfo"                    \
                   -DOSIM_VERSION="$version"
@@ -78,11 +89,17 @@ common_poptions += -DSPDLOG_COMPILED_LIB
 #
 common_poptions += -DSWIG_PYTHON
 
+if ($cxx.target.class == 'windows')
+  common_poptions += -D_CRT_SECURE_NO_DEPRECATE
+
 # Note that none of the macros defined in the upstream build are referenced in
 # Vendors/lepton.
 #
-Vendors/lepton/src/obj{*}: \
-  cxx.poptions += "-I$src_root/libopensim/Vendors/lepton/include"
+Vendors/lepton/src/obj{*}:                                              \
+  cxx.poptions += "-I$src_root/libopensim/Vendors/lepton/include"       \
+                  -DOPENSIM_LEPTON_AUTHORS=\"Peter_Eastman\"            \
+                  -DOSIMLEPTON_EXPORTS                                  \
+                  $common_poptions
 
 OpenSim/Common/obj{*}:                                                                  \
   cxx.poptions += "-I$src_root/libopensim"                                              \
@@ -147,21 +164,25 @@ OpenSim/Tools/obj{*}: cxx.poptions +=                                   \
 # differences. Define the same macros as above (sans _AUTHORS) even though
 # they're not present upstream to cover us when the upstream build is updated.
 #
-OpenSim/Moco/obj{*}: cxx.poptions +=                                    \
-                     "-I$src_root/libopensim"                           \
-                     -DOPENSIM_MOCO_AUTHORS=\"\"                        \
-                     -DOPENSIM_MOCO_COPYRIGHT_YEARS=\"2005-2017\"       \
-                     -DOPENSIM_MOCO_LIBRARY_NAME=osimMoco               \
-                     -DOPENSIM_MOCO_MAJOR_VERSION="$version.major"      \
-                     -DOPENSIM_MOCO_MINOR_VERSION="$version.minor"      \
-                     -DOPENSIM_MOCO_BUILD_VERSION="$version.patch"      \
-                     -DOSIMMOCO_EXPORTS                                 \
-                     $common_poptions                                   \
-                     -DOPENSIM_MOCO_VERSION="$version"
+OpenSim/Moco/obj{*}:                            \
+  cxx.poptions +=                               \
+  "-I$src_root/libopensim"                      \
+  -DOPENSIM_MOCO_AUTHORS=\"\"                   \
+  -DOPENSIM_MOCO_COPYRIGHT_YEARS=\"2005-2017\"  \
+  -DOPENSIM_MOCO_LIBRARY_NAME=osimMoco          \
+  -DOPENSIM_MOCO_MAJOR_VERSION="$version.major" \
+  -DOPENSIM_MOCO_MINOR_VERSION="$version.minor" \
+  -DOPENSIM_MOCO_BUILD_VERSION="$version.patch" \
+  -DOSIMMOCO_EXPORTS                            \
+  $common_poptions                              \
+  -DOPENSIM_MOCO_VERSION="$(version.major).$(version.minor).$(version.patch)"
 
 # Note that upstream does not build static libraries. I don't think it's
 # supported.
 #
+Vendors/lepton/src/objs{*}: cxx.poptions += -DLEPTON_BUILDING_SHARED_LIBRARY
+Vendors/lepton/src/obja{*}: cxx.poptions += -DLEPTON_BUILDING_STATIC_LIBRARY
+
 OpenSim/Common/objs{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Shared\"
 OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\"
 
@@ -179,6 +200,40 @@ OpenSim/Tools/obja{*}: cxx.poptions += -DOPENSIM_TOOLS_TYPE=\"Static\"
 
 OpenSim/Moco/objs{*}: cxx.poptions += -DOPENSIM_MOCO_TYPE=\"Shared\"
 OpenSim/Moco/obja{*}: cxx.poptions += -DOPENSIM_MOCO_TYPE=\"Static\"
+
+# Warnings: Upstream passes -Wall -Wextra -Wno-unused-local-typedefs in debug
+# builds which results in pages of warnings. In non-debug builds they also
+# pass -Wno-unused-variable -Wno-unused-parameter but still dozens of warnings
+# are emitted.
+
+if ($cxx.class == 'gcc')
+{
+  obj{*}: cxx.coptions += -funroll-loops                \
+                          -Wno-unused-local-typedefs    \
+                          -Wno-unused-variable          \
+                          -Wno-unused-parameter
+}
+
+# "-Wshorten-64-to-32 helps us catch default warnings from Visual C++."
+#
+#    @@ Not sure what this means. Their check is just
+#       `if(CMAKE_CXX_COMPILER_ID MATCHES Clang)`, so they're not checking for
+#       clang-cl. So this will match many non-MSVC configs.
+#
+if ($cxx.id.type == 'clang')
+  obj{*}: cxx.coptions += -Wshorten-64-to-32
+
+# C4068: unknown pragma (from upstream build)
+#
+# @@ TODO Upstream passes /GS- which disables buffer overrun checking. Seems
+#    like a bad idea so leaving it on for now.
+#
+if ($cxx.class == 'msvc')
+{
+  obj{*}: cxx.coptions += /bigobj       \
+                          /Oi           \
+                          /wd4068
+}
 
 # Libraries
 #
