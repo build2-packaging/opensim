@@ -31,5 +31,5 @@ macos-build-config: config.bin.lib=shared ; Conserve disk space on CI VMs.
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
 depends: spdlog ^1.14.1
-depends: libsimbody ^3.8.0-
+depends: libsimbody ^3.8.0
 tests: libopensim-tests == $
