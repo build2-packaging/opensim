@@ -1,0 +1,7 @@
+: 1
+name: libopensim
+version: 4.5.2
+language: c++
+project: opensim
+summary: SimTK OpenSim Musculoskeletal Simulation C++ library
+license: Apache-2.0; Apache License 2.0.
