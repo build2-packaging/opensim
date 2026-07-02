@@ -1,0 +1,1 @@
+../../../../upstream/OpenSim/Analyses/RegisterTypes_osimAnalyses.h
