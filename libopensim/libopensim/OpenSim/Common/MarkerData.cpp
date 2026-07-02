@@ -32,7 +32,6 @@
 #include "SimmIO.h"
 #include "SimmMacros.h"
 #include "Storage.h"
-#include "OpenSim/Auxiliary/auxiliaryTestFunctions.h"
 #include "OpenSim/Common/STOFileAdapter.h"
 
 //=============================================================================
