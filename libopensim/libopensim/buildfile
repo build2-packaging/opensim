@@ -186,29 +186,37 @@ OpenSim/Moco/obj{*}:                            \
   $common_poptions                              \
   -DOPENSIM_MOCO_VERSION="$(version.major).$(version.minor).$(version.patch)"
 
-# Note that upstream does not build static libraries. I don't think it's
-# supported.
+# Static build support (config.bin.lib=static).
+#
+# Object.cpp uses the construct-on-first-use idiom (function-local statics)
+# for its type-registry statics, same as Logger.cpp, eliminating the SIOF.
 #
 Vendors/lepton/src/objs{*}: cxx.poptions += -DLEPTON_BUILDING_SHARED_LIBRARY
 Vendors/lepton/src/obja{*}: cxx.poptions += -DLEPTON_BUILDING_STATIC_LIBRARY
 
 OpenSim/Common/objs{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Shared\"
-OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\"
+OpenSim/Common/obja{*}: cxx.poptions += -DOPENSIM_COMMON_TYPE=\"Static\" \
+                                         -DOPENSIM_COMMON_TYPE_STATIC
 
 OpenSim/Simulation/objs{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Shared\"
-OpenSim/Simulation/obja{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Static\"
+OpenSim/Simulation/obja{*}: cxx.poptions += -DOPENSIM_SIMULATION_TYPE=\"Static\" \
+                                             -DOPENSIM_SIMULATION_TYPE_STATIC
 
 OpenSim/Actuators/objs{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Shared\"
-OpenSim/Actuators/obja{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Static\"
+OpenSim/Actuators/obja{*}: cxx.poptions += -DOPENSIM_ACTUATORS_TYPE=\"Static\" \
+                                            -DOPENSIM_ACTUATORS_TYPE_STATIC
 
 OpenSim/Analyses/objs{*}: cxx.poptions += -DOPENSIM_ANALYSES_TYPE=\"Shared\"
-OpenSim/Analyses/obja{*}: cxx.poptions += -DOPENSIM_ANALYSES_TYPE=\"Static\"
+OpenSim/Analyses/obja{*}: cxx.poptions += -DOPENSIM_ANALYSES_TYPE=\"Static\" \
+                                           -DOPENSIM_ANALYSES_TYPE_STATIC
 
 OpenSim/Tools/objs{*}: cxx.poptions += -DOPENSIM_TOOLS_TYPE=\"Shared\"
-OpenSim/Tools/obja{*}: cxx.poptions += -DOPENSIM_TOOLS_TYPE=\"Static\"
+OpenSim/Tools/obja{*}: cxx.poptions += -DOPENSIM_TOOLS_TYPE=\"Static\" \
+                                        -DOPENSIM_TOOLS_TYPE_STATIC
 
 OpenSim/Moco/objs{*}: cxx.poptions += -DOPENSIM_MOCO_TYPE=\"Shared\"
-OpenSim/Moco/obja{*}: cxx.poptions += -DOPENSIM_MOCO_TYPE=\"Static\"
+OpenSim/Moco/obja{*}: cxx.poptions += -DOPENSIM_MOCO_TYPE=\"Static\" \
+                                       -DOPENSIM_MOCO_TYPE_STATIC
 
 # Warnings: Upstream passes -Wall -Wextra -Wno-unused-local-typedefs in debug
 # builds which results in pages of warnings. In non-debug builds they also
@@ -276,6 +284,18 @@ lib{osimLepton}: cxx.export.poptions = \
 #
 lib{osimCommon}: cxx.export.poptions = "-I$src_base" \
                                        -DNDEBUG
+
+if ($cxx.target.class == 'windows')
+{
+  liba{osimLepton}:     cxx.export.poptions += -DLEPTON_USE_STATIC_LIBRARIES
+  liba{osimCommon}:     cxx.export.poptions += -DOPENSIM_COMMON_TYPE_STATIC    \
+                                               -DLEPTON_USE_STATIC_LIBRARIES
+  liba{osimSimulation}: cxx.export.poptions += -DOPENSIM_SIMULATION_TYPE_STATIC
+  liba{osimActuators}:  cxx.export.poptions += -DOPENSIM_ACTUATORS_TYPE_STATIC
+  liba{osimAnalyses}:   cxx.export.poptions += -DOPENSIM_ANALYSES_TYPE_STATIC
+  liba{osimTools}:      cxx.export.poptions += -DOPENSIM_TOOLS_TYPE_STATIC
+  liba{osimMoco}:       cxx.export.poptions += -DOPENSIM_MOCO_TYPE_STATIC
+}
 
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
