@@ -90,11 +90,11 @@ void FiberCompressiveForceCosPennationCurve::buildCurve( bool computeIntegral )
 {
     SmoothSegmentedFunction* f = SmoothSegmentedFunctionFactory::
         createFiberCompressiveForceCosPennationCurve(   
-                cos(get_engagement_angle_in_degrees()*Pi/180.0), 
+                cos(get_engagement_angle_in_degrees()*SimTK_PI/180.0),
                 m_stiffnessAtPerpendicularInUse,
                 m_curvinessInUse,
                 computeIntegral,
-                getName());       
+                getName());
 
     m_curve = *f; 
     
@@ -114,7 +114,7 @@ void FiberCompressiveForceCosPennationCurve::ensureCurveUpToDate()
             getProperty_curviness().empty() == true)
         {
             double eAngleRad = get_engagement_angle_in_degrees()
-                              *Pi/180.0;
+                              *SimTK_PI/180.0;
 
             m_stiffnessAtPerpendicularInUse= -2.0/cos(eAngleRad); 
             m_curvinessInUse = 0.1;
@@ -172,11 +172,11 @@ SimTK::Function* FiberCompressiveForceCosPennationCurve::createSimTKFunction() c
     
     return SmoothSegmentedFunctionFactory::
         createFiberCompressiveForceCosPennationCurve(   
-                cos(get_engagement_angle_in_degrees()*Pi/180.0), 
+                cos(get_engagement_angle_in_degrees()*SimTK_PI/180.0),
                 m_stiffnessAtPerpendicularInUse,
                 m_curvinessInUse,
                 false,
-                getName());       
+                getName());
 }
 
 
