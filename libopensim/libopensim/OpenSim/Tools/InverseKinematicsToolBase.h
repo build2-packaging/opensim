@@ -25,7 +25,8 @@
 
 #include "osimToolsDLL.h"
 #include "Tool.h"
-#include <SimTKcommon/internal/ReferencePtr.h> 
+#include <SimTKcommon/internal/ReferencePtr.h>
+#include <limits>
 
 namespace OpenSim {
 
@@ -113,11 +114,11 @@ public:
 private:
     void constructProperties() {
         constructProperty_model_file("");
-        constructProperty_constraint_weight(SimTK::Infinity);
+        constructProperty_constraint_weight(std::numeric_limits<double>::infinity());
         constructProperty_accuracy(1e-5);
-        Array<double> range{SimTK::Infinity, 2};
+        Array<double> range{std::numeric_limits<double>::infinity(), 2};
         // Make range -Infinity to Infinity unless limited by data
-        range[0] = -SimTK::Infinity; 
+        range[0] = -std::numeric_limits<double>::infinity();
         constructProperty_time_range(range);
         constructProperty_output_motion_file("");
         constructProperty_report_errors(true);
