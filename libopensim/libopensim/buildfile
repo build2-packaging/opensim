@@ -35,18 +35,23 @@ sysinfo = "$osname-$cxx.target.cpu"
 ./: lib{osimLepton}: Vendors/lepton/include/hxx{**} \
                      Vendors/lepton/src/{hxx cxx}{*}
 
-./: lib{osimCommon}: OpenSim/hxx{*}                                             \
-                     OpenSim/Common/{hxx cxx}{* -C3DFileAdapter -gcvspl}        \
-                     OpenSim/Common/{h c}{gcvspl}                               \
+./: lib{osimCommon}: OpenSim/hxx{*}                                                    \
+                     OpenSim/Common/{hxx cxx}{* -C3DFileAdapter -gcvspl -*DLL.cpp}    \
+                     OpenSim/Common/{h c}{gcvspl}                                      \
                      OpenSim/Auxiliary/hxx{*}
+libs{osimCommon}: OpenSim/Common/cxx{osimCommonDLL}
 
-./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/**}
+./: lib{osimSimulation}: OpenSim/Simulation/{hxx cxx}{** -**Test/** -*DLL.cpp}
+libs{osimSimulation}: OpenSim/Simulation/cxx{osimSimulationDLL}
 
-./: lib{osimActuators}: OpenSim/Actuators/{hxx cxx}{** -Test/**}
+./: lib{osimActuators}: OpenSim/Actuators/{hxx cxx}{** -Test/** -*DLL.cpp}
+libs{osimActuators}: OpenSim/Actuators/cxx{osimActuatorsDLL}
 
-./: lib{osimAnalyses}: OpenSim/Analyses/{hxx cxx}{** -Test/**}
+./: lib{osimAnalyses}: OpenSim/Analyses/{hxx cxx}{** -Test/** -*DLL.cpp}
+libs{osimAnalyses}: OpenSim/Analyses/cxx{osimAnalysesDLL}
 
-./: lib{osimTools}: OpenSim/Tools/{hxx cxx}{** -Test/**}
+./: lib{osimTools}: OpenSim/Tools/{hxx cxx}{** -Test/** -*DLL.cpp}
+libs{osimTools}: OpenSim/Tools/cxx{osimToolsDLL}
 
 # Note: We don't enable CasADi support but do arrange for the sources to be
 #       distributed. Note that we exclude all of MocoCasADiSolver/ except
