@@ -25,6 +25,7 @@
 // INCLUDES
 //=============================================================================
 #include "ClutchedPathSpring.h"
+#include <limits>
 
 
 //=============================================================================
@@ -64,8 +65,8 @@ ClutchedPathSpring::ClutchedPathSpring(const string& name, double stiffness,
 void ClutchedPathSpring::constructProperties()
 {
     setAuthors("Ajay Seth");
-    constructProperty_stiffness(SimTK::NaN);
-    constructProperty_dissipation(SimTK::NaN);
+    constructProperty_stiffness(std::numeric_limits<double>::quiet_NaN());
+    constructProperty_dissipation(std::numeric_limits<double>::quiet_NaN());
     constructProperty_relaxation_time_constant(0.001); //1ms
     constructProperty_initial_stretch(0.0);
     setMinControl(0.0);
