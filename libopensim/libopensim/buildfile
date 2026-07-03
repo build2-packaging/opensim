@@ -297,6 +297,18 @@ if ($cxx.target.class == 'windows')
   liba{osimMoco}:       cxx.export.poptions += -DOPENSIM_MOCO_TYPE_STATIC
 }
 
+# Whole-archive linking for static builds.
+#
+# Each OpenSim library has a RegisterTypes_osim*.cpp TU with a file-scope
+# static that self-registers all types. In shared builds this runs when the
+# DLL is loaded. In static builds the linker strips unreferenced object files
+# unless whole-archive is active, so the registration never runs. Setting
+# bin.whole on the liba{} targets here ensures every consumer links all
+# object files and registration happens.
+#
+liba{osimCommon osimSimulation osimActuators osimAnalyses osimTools osimMoco}: \
+  bin.whole = true
+
 lib{osimCommon}:     cxx.export.libs = $simbody $spdlog lib{osimLepton}
 lib{osimSimulation}: cxx.export.libs = lib{osimCommon}
 lib{osimActuators}:  cxx.export.libs = lib{osimSimulation}
