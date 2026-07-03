@@ -27,6 +27,7 @@
 #include "Body.h"
 #include <OpenSim/Common/ScaleSet.h>
 #include "simbody/internal/MobilizedBody.h"
+#include <limits>
 
 //=============================================================================
 // STATICS
@@ -68,7 +69,7 @@ Body::Body(const std::string &aName,double aMass,const SimTK::Vec3& aMassCenter,
  */
 void Body::constructProperties()
 {
-    constructProperty_mass(SimTK::NaN);
+    constructProperty_mass(std::numeric_limits<double>::quiet_NaN());
     constructProperty_mass_center(SimTK::Vec3(0));
     constructProperty_inertia(SimTK::Vec6(0));
 }
