@@ -25,6 +25,7 @@
 // INCLUDES
 //=============================================================================
 #include "PathSpring.h"
+#include <limits>
 
 //=============================================================================
 // STATICS
@@ -61,9 +62,9 @@ void PathSpring::constructProperties()
 {
     setAuthors("Ajay Seth");
     constructProperty_path(GeometryPath());
-    constructProperty_resting_length(SimTK::NaN);
-    constructProperty_stiffness(SimTK::NaN);
-    constructProperty_dissipation(SimTK::NaN);
+    constructProperty_resting_length(std::numeric_limits<double>::quiet_NaN());
+    constructProperty_stiffness(std::numeric_limits<double>::quiet_NaN());
+    constructProperty_dissipation(std::numeric_limits<double>::quiet_NaN());
 
     // override default GeometryPath color (at time of writing, grey) with
     // green for backwards-compatibility

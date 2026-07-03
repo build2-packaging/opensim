@@ -26,6 +26,7 @@
 //=============================================================================
 #include "ConstantDistanceConstraint.h"
 
+#include <limits>
 #include <simbody/internal/MobilizedBody.h>
 #include <simbody/internal/Constraint_Rod.h>
 
@@ -97,7 +98,7 @@ void ConstantDistanceConstraint::constructProperties()
     constructProperty_location_body_2(origin);
 
     // Constant distance between points
-    constructProperty_constant_distance(SimTK::NaN);
+    constructProperty_constant_distance(std::numeric_limits<double>::quiet_NaN());
 }
 
 void ConstantDistanceConstraint::extendAddToSystem(SimTK::MultibodySystem& system) const
