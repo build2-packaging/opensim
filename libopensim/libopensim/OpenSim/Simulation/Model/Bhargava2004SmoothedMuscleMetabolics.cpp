@@ -20,6 +20,7 @@
 #include "Bhargava2004SmoothedMuscleMetabolics.h"
 
 #include <SimTKcommon/internal/State.h>
+#include <limits>
 
 #include <OpenSim/Common/Component.h>
 #include <OpenSim/Simulation/Model/Model.h>
@@ -58,7 +59,7 @@ void Bhargava2004SmoothedMuscleMetabolics_MuscleParameters::
     constructProperty_ratio_slow_twitch_fibers(0.5);
 
     constructProperty_use_provided_muscle_mass(false);
-    constructProperty_provided_muscle_mass(SimTK::NaN);
+    constructProperty_provided_muscle_mass(std::numeric_limits<double>::quiet_NaN());
 
     // Defaults (W/kg) from Bhargava et al (2004).
     constructProperty_activation_constant_slow_twitch(40.0);

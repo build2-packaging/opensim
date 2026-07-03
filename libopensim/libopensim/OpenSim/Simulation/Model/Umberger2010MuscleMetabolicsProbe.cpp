@@ -29,6 +29,7 @@
 #include "Umberger2010MuscleMetabolicsProbe.h"
 #include <OpenSim/Simulation/Model/Model.h>
 #include <OpenSim/Simulation/Model/Muscle.h>
+#include <limits>
 //#define DEBUG_METABOLICS
 
 using namespace std;
@@ -849,7 +850,7 @@ void Umberger2010MuscleMetabolicsProbe_MetabolicMuscleParameter::setNull()
     // user. If <use_provided_muscle_mass> == false, then this value
     // will be set (by the metabolic probes) to the calculated mass based on
     // the muscle's Fmax, optimal fiber length, specific tension & muscle density. 
-    _muscMass = SimTK::NaN;
+    _muscMass = std::numeric_limits<double>::quiet_NaN();
     _musc = NULL;
 }
 
@@ -860,6 +861,6 @@ constructProperties()
     constructProperty_density(1059.7);           // (kg/m^3), density of mammalian muscle.
     constructProperty_ratio_slow_twitch_fibers(0.5);
     constructProperty_use_provided_muscle_mass(false);
-    constructProperty_provided_muscle_mass(SimTK::NaN);
+    constructProperty_provided_muscle_mass(std::numeric_limits<double>::quiet_NaN());
 }
 
