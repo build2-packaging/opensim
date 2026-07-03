@@ -18,6 +18,8 @@
 
 #include "MocoFrameDistanceConstraint.h"
 
+#include <limits>
+
 using namespace OpenSim;
 
 //=============================================================================
@@ -42,7 +44,7 @@ void MocoFrameDistanceConstraintPair::constructProperties() {
     constructProperty_frame1_path("");
     constructProperty_frame2_path("");
     constructProperty_minimum_distance(0);
-    constructProperty_maximum_distance(SimTK::Infinity);
+    constructProperty_maximum_distance(std::numeric_limits<double>::infinity());
 }
 
 //=============================================================================
