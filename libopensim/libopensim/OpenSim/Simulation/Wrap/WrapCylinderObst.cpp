@@ -32,7 +32,7 @@ using SimTK::Vec3;
 
 static const char* wrapTypeName = "cylinderObst";
 
-static const double TwoPi = 2.0*SimTK::Pi;
+static const double TwoPi = 2.0*SimTK_PI;
 static const double max_wrap_pts_circle_ang = (5.0/360.0)*TwoPi;
 
 //=============================================================================
