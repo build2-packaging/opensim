@@ -112,9 +112,7 @@ int main()
                 ModelComponent* comp = ModelComponent::safeDownCast(randClone);
                 testModel.addModelComponent(comp);
             } //Ignore the validity of the property values
-            catch (const InvalidPropertyValue&) {
-                // const string& errMsg = err.getMessage();
-                //std::cout << errMsg << std::endl;
+            catch (const std::exception&) {
             }
         }
 
