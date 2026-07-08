@@ -1,12 +1,19 @@
-# Symlink input files into working directory.
-#
-#   --no-cleanup: Don't register file for cleanup
+# Symlink input files into working directory. For directory entries cp -r is
+# used instead of ln -s: libbutl's mksymlink() calls path_entry() with
+# follow_symlinks=false, classifying a symlink-to-directory target as
+# entry_type::symlink and calling CreateSymbolicLink() without
+# SYMBOLIC_LINK_FLAG_DIRECTORY. The resulting file symlink is rejected by
+# _chdir() on Windows. https://github.com/build2/build2/issues/549
 #
 for f: $input_files
-  ln -s --no-cleanup $src_base/$f ./
+  if $regex.match("$f", '.+/')
+    src = [path] $src_base/$f
+    cp -r --no-cleanup $src ./
+  else
+    n = $path.leaf($f)
+    ln -s $src_base/$f ./
+    true &!$n
+  end
 end;
 
-# Register all files in working directory for cleanup (if any exist); redirect
-# stdout and stderr to /dev/null.
-#
-$* &?$~/* >- 2>!
+$* &?$~/*** >! 2>!
