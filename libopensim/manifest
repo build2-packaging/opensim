@@ -14,19 +14,8 @@ src-url: https://github.com/opensim-org/opensim-core
 package-url: https://github.com/build2-packaging/opensim
 package-email: packaging@build2.org ; Mailing list.
 
-# Linux, FreeBSD: No LAPACK or BLAS on CI (for libsimbody).
-#
-builds: none
-
-windows-builds: &windows
-windows-builds: -static ; Static Windows configs not supported (libsimbody)
-windows-build-exclude: windows*-clang*llvm** ; See libsimbody.
-windows-build-exclude: **mingw_w64** ; Not supported.
-windows-build-config: config.bin.lib=shared ; Conserve disk space on CI VMs.
-
-macos-builds: &macos
-macos-builds: -static ; Static macOS builds not supported (test failures).
-macos-build-config: config.bin.lib=shared ; Conserve disk space on CI VMs.
+build-include: macos**
+build-exclude: ** ; Depends on intel-oneapi-toolkit which downloads large binaries on CI.
 
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
