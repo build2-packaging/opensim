@@ -216,8 +216,12 @@ SimTK::Matrix OpenSim::computeKNearestNeighbors(const SimTK::Matrix& x,
         std::sort(distancesVec.begin(), distancesVec.end(),
                 [](const double& a, const double& b) { return a < b; });
 
-        // Take the first K distances.
-        for (int ik = 0; ik < k; ++ik) {
+        // Take the first K distances. If 'x' has fewer than 'k' points
+        // (e.g., k=2 requested from a single-point design), bound the loop
+        // to avoid reading past the end of distancesVec; the corresponding
+        // columns in 'distances' keep their initialized value of 0.0.
+        const int kAvailable = std::min(k, (int)distancesVec.size());
+        for (int ik = 0; ik < kAvailable; ++ik) {
             distances.set(iy, ik, distancesVec[ik]);
         }
     }
