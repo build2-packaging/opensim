@@ -571,8 +571,11 @@ void testBoundsCheck() {
     states.append(state);
     states.append(state);
 
-    #ifdef NDEBUG
+    #if defined(NDEBUG) && !defined(_GLIBCXX_ASSERTIONS)
         // In DEBUG, Visual Studio puts asserts into the index operator.
+        // Skipped under libstdc++ hardening (_GLIBCXX_ASSERTIONS), which
+        // bounds-checks std::vector::operator[] even in NDEBUG builds and
+        // aborts on these intentionally out-of-range accesses.
         states[states.getSize() + 100];
         states[4];
         states[5];
