@@ -20,5 +20,5 @@ build-exclude: ** ; Depends on intel-oneapi-toolkit which downloads large binari
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
 depends: spdlog ^1.14.1
-depends: libsimbody ^3.8.0-
+depends: libsimbody ^3.8.0
 tests: libopensim-tests == $
