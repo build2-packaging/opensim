@@ -261,6 +261,7 @@ if ($cxx.class == 'msvc')
   obj{*}: cxx.coptions += /bigobj       \
                           /Oi           \
                           /wd4068
+  obj{*}: cxx.poptions += -D_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 }
 
 # Libraries
