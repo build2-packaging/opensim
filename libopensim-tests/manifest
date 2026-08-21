@@ -4,8 +4,9 @@ version: 4.5.2-a.0.z
 type: exe
 language: c++
 project: opensim
-summary: Upstream tests for libopensim
+summary: SimTK OpenSim Musculoskeletal Simulation C++ library (tests)
 license: Apache-2.0 ; Apache License 2.0.
+package-description-file: PACKAGE-README.md
 url: https://opensim.stanford.edu
 doc-url: https://opensimconfluence.atlassian.net/wiki/spaces/OpenSim/overview
 src-url: https://github.com/opensim-org/opensim-core
