@@ -1,6 +1,6 @@
 : 1
 name: libopensim
-version: 4.5.2-a.0.z
+version: 4.5.2
 language: c++
 project: opensim
 summary: SimTK OpenSim Musculoskeletal Simulation C++ library

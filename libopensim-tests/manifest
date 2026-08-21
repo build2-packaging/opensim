@@ -1,6 +1,6 @@
 : 1
 name: libopensim-tests
-version: 4.5.2-a.0.z
+version: 4.5.2
 type: exe
 language: c++
 project: opensim
