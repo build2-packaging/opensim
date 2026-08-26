@@ -358,6 +358,12 @@ Vendors/hxx{*}:
   install.subdirs = false # Note: required
 }
 
+# CasADi is disabled. Keep MocoCasADiSolver.h (public stub) but do not install
+# the CasADi implementation headers.
+#
+OpenSim/Moco/MocoCasADiSolver/hxx{*CasOC*}: install = false
+
+
 # The Lepton headers need to be rearranged a bit.
 #
 Vendors/lepton/include/hxx{Lepton}@./Vendors/lepton/include/: \

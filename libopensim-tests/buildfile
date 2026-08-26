@@ -1,1 +1,6 @@
 ./: {*/ -build/} doc{PACKAGE-README.md} legal{LICENSE.txt} manifest
+
+# Don't install tests.
+#
+libopensim-tests/: install = false
+
